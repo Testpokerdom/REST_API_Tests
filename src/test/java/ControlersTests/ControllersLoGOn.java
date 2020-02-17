@@ -3,10 +3,14 @@ package ControlersTests;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONString;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.lang.reflect.Array;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,49 +24,15 @@ public class ControllersLoGOn {
     private String session_id = null;
     private String controllers_id = null;
     private String task_id = null;
+    private Object task_idd = null;
+    private JSONArray task_iddd = null;
 
     @BeforeClass
     public void setBaseUrl() {
 
         RestAssured.baseURI = "https://mobile.104.ua/billing/";
-        //RestAssured.baseURI = "https://api.trello.com";
-        //RestAssured.basePath = "/1/boards";
-    }
-/*
-    @Test
-    public void getRequsetBoardInfo() {
-        //Response res =
-        given()
-                .param("key", "8d766f6e379168515a4993104c937c80")
-                .param("token", "46af8f3f4e6d93d572e45635479619522ccd2e1dff3e96ed947b1c2594c9ac29")
-                .when()
-                .get("/5d826642c999291ed8290832")
-                .then()
-                .assertThat().statusCode(200)
-                .and()
-                .body("id", equalTo("5d826642c999291ed8290832"))
-                .and()
-                .body("prefs.backgroundColor",  equalTo("#0079BF"))
-                .contentType(ContentType.JSON);
-        // System.out.println(res.body().prettyPrint());
-    }
-    @Test (dependsOnMethods = {"getRequsetBoardInfo"})
-    public void getRequsetBoardCards() {
-//	 Response res =
-        given()
-                .param("key", "8d766f6e379168515a4993104c937c80")
-                .param("token", "46af8f3f4e6d93d572e45635479619522ccd2e1dff3e96ed947b1c2594c9ac29")
-                .when()
-                .get("/5d80fed45ea7514f279bc675/cards")
-                .then()
-                .assertThat().statusCode(200)
-                .and()
-                .body("id[0]", equalTo("5d811b257b35c24d2c87a5bf"))
-                .contentType(ContentType.JSON);
 
-//	 System.out.println(res.body().prettyPrint());
     }
-    */
 
     @Test(priority = 0)
     public void testLogin(){
@@ -77,9 +47,9 @@ public class ControllersLoGOn {
                 .assertThat().statusCode(200)
                 .and()
                 .body("controller_id", equalTo("22415385"));
-        JSONObject jsonresponce = new JSONObject(response.extract().asString());
-        session_id = jsonresponce.getString("session_id");
-        controllers_id = jsonresponce.getString("controller_id");
+        JSONObject jsonResponse = new JSONObject(response.extract().asString());
+        session_id = jsonResponse.getString("session_id");
+        controllers_id = jsonResponse.getString("controller_id");
         System.out.println("Session id: " + session_id);
         System.out.println("Controller id: " + controllers_id);
     }
@@ -97,14 +67,27 @@ public class ControllersLoGOn {
                 .post("api/v2/controllers/tasks")
                 .then()
                 .assertThat().statusCode(200);
-                //.and()
-                //.body("data.task_id[4]", equalTo("85322713"));
+        JSONObject jsonResponse = new JSONObject(response.extract().asString());
+        System.out.println("Response body: " + jsonResponse);
+        JSONArray jsonArray = jsonResponse.getJSONArray("data");
+        System.out.println("Response body: " + jsonResponse);
+        JSONObject jsonTaskId = jsonArray.getJSONObject(4);
+        System.out.println("Task id array: " + jsonTaskId);
+        String status_message = jsonTaskId.getString("task_id");
+        Assert.assertEquals(status_message, "85322713");
 
+        //task_id = jsonTaskId.getString("task_id");
+        /*
+        JSONObject jsonTaskNumber = jsonTaskId.getJSONObject("task_id");
+
+        System.out.println("task_id id: " + jsonTaskNumber);
+*/
+        /*
         JSONObject jsonresponce = new JSONObject(response.extract().asString());
-        System.out.println("task_id id: " + jsonresponce);
-        task_id = jsonresponce.getString("task_id[4]");
+        System.out.println("task_id is: " + jsonresponce);
+        task_id = jsonresponce.getString("data.task_id");
         System.out.println("task_id id: " + task_id);
-
+*/
     }
 
 }
