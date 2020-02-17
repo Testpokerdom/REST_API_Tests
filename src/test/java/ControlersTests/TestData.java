@@ -37,12 +37,15 @@ public class TestData {
     }
 
     public String getxApplicationKeyControlsApp(){
+
         return getTestDataControlsApp().get("xApplicationKeyControlsApp");
     }
-    String getLogin(){
+    public String getLogin(){
+
         return  getTestDataControlsApp().get("login");
     }
-    String getPasswordConrolApp(){
+    public String getPasswordConrolApp(){
+
         return getTestDataControlsApp().get("password");
     }
 
