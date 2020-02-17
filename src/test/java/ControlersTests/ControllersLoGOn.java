@@ -1,16 +1,12 @@
 package ControlersTests;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.lang.reflect.Array;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,9 +19,9 @@ public class ControllersLoGOn {
     private String passwword = testData.getPasswordConrolApp();
     private String session_id = null;
     private String controllers_id = null;
-    private String task_id = null;
-    private Object task_idd = null;
-    private JSONArray task_iddd = null;
+    private int task_id = 0;
+    private String user_id = null;
+
 
     @BeforeClass
     public void setBaseUrl() {
@@ -68,26 +64,36 @@ public class ControllersLoGOn {
                 .then()
                 .assertThat().statusCode(200);
         JSONObject jsonResponse = new JSONObject(response.extract().asString());
-        System.out.println("Response body: " + jsonResponse);
         JSONArray jsonArray = jsonResponse.getJSONArray("data");
-        System.out.println("Response body: " + jsonResponse);
         JSONObject jsonTaskId = jsonArray.getJSONObject(4);
-        System.out.println("Task id array: " + jsonTaskId);
-        String status_message = jsonTaskId.getString("task_id");
-        Assert.assertEquals(status_message, "85322713");
-
-        //task_id = jsonTaskId.getString("task_id");
-        /*
-        JSONObject jsonTaskNumber = jsonTaskId.getJSONObject("task_id");
-
-        System.out.println("task_id id: " + jsonTaskNumber);
-*/
-        /*
-        JSONObject jsonresponce = new JSONObject(response.extract().asString());
-        System.out.println("task_id is: " + jsonresponce);
-        task_id = jsonresponce.getString("data.task_id");
-        System.out.println("task_id id: " + task_id);
-*/
+        task_id = jsonTaskId.getInt("task_id");
+        System.out.println("Task id: " + task_id);
+        Assert.assertEquals(task_id, 85322713);
     }
+
+    @Test(priority = 1)
+    public void testGetUsersInfo(){
+        ValidatableResponse response;
+        response = given()
+                .header("X-Application-Key", xApplicationKeyControlsApp)
+                .header("X-Session-Id", session_id)
+                .param("task_date", "2019-12-09")
+                .param("pjscs_id", 21)
+                .param("rgc_controller_id", controllers_id)
+                .when()
+                .post("api/v2/controllers/all")
+                .then()
+                .assertThat().statusCode(200);
+
+        JSONObject jsonResponse = new JSONObject(response.extract().asString());
+        JSONArray jsonArray = jsonResponse.getJSONArray("tasks");
+        System.out.println(jsonArray);
+        //JSONArray jsonArray2 = jsonArray.getJSONArray(1);
+        JSONArray jsonTaskId = jsonArray.getJSONArray(3);
+        user_id = jsonArray.getString(0);
+        System.out.println("Task id: " + user_id);
+        Assert.assertEquals(user_id, 424201251);
+    }
+
 
 }
